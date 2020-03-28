@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vs/models/counter.dart';
 
 class CounterWidget extends StatefulWidget {
-  CounterData data;
+  Counter data;
   int position;
   bool animate;
 
@@ -14,7 +14,11 @@ class CounterWidget extends StatefulWidget {
   }
 }
 
-class _CounterWidgetState extends State<CounterWidget> with TickerProviderStateMixin {
+class _CounterWidgetState extends State<CounterWidget>
+    with TickerProviderStateMixin {
+  static final BorderRadius borderRadius = BorderRadius.only(
+      bottomRight: Radius.circular(15), topLeft: Radius.circular(15));
+
   bool visible = false;
 
   _setVisible() async {
@@ -30,7 +34,7 @@ class _CounterWidgetState extends State<CounterWidget> with TickerProviderStateM
       duration: Duration(milliseconds: 500),
       child: Card(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: borderRadius,
         ),
         color: widget.data.color,
         child: Listener(
@@ -49,6 +53,7 @@ class _CounterWidgetState extends State<CounterWidget> with TickerProviderStateM
             }
           },
           child: InkWell(
+            borderRadius: borderRadius,
             onTap: () {},
             child: Center(
                 child: Text(widget.data.number.toString(),
