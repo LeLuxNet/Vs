@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vs/components/counter.dart';
+import 'package:vs/components/drawer.dart';
 import 'package:vs/models/counter.dart';
 import 'package:vs/models/game.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/store.dart';
 
 class MainScreen extends StatefulWidget {
+  int id;
+
+  MainScreen(this.id);
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -14,7 +19,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   Future<Game> _game;
   DataStore store;
+
   bool firstBuild = true;
+  String _title = "";
 
   Choice _resetButton;
   Choice _settingsButton;
@@ -23,7 +30,16 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     store = new DataStore();
-    _game = store.getGame();
+
+    print("GameId: " + widget.id.toString());
+
+    if (widget.id == null) {
+      widget.id = 1;
+    }
+
+    _game = store.getGame(widget.id, true);
+
+    _game.then((value) => setState(() => _title = value.name));
 
     _resetButton = Choice(
         title: 'reset',
@@ -97,37 +113,18 @@ class _MainScreenState extends State<MainScreen> {
         });
   }
 
-  Widget _getDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            child: Text(AppLocalizations.of(context).translate("appName")),
-            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-          ),
-          ListTile(
-            leading: Icon(MdiIcons.dice3),
-            title: Text('Game'),
-            onTap: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context).translate("appName")),
+          title: Text(_title),
           actions: <Widget>[
             _getAppBarIcon(true),
             _getAppBarIcon(false),
             _getPopupMenu()
           ],
         ),
-        drawer: _getDrawer(),
+        drawer: DrawerWidget(store),
         body: new FutureBuilder<Game>(
             future: _game,
             builder: (context, snapshot) {

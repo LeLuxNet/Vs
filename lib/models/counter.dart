@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'game.dart';
 
 class Counter {
-  int number = 0;
+  int number;
   Color color;
   Game game;
 
-  Counter(this.color, this.game);
+  Counter(this.number, this.color, this.game);
+
+  Counter.fromMap(Game game, Map map)
+      : this(map["number"], Color(map["color"]), game);
 
   add() {
     number++;
@@ -23,5 +26,9 @@ class Counter {
 
   reset() {
     number = 0;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"number": number, "color": color.value};
   }
 }

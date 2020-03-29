@@ -10,25 +10,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Vs.',
-      theme: ThemeData(primarySwatch: Colors.yellow),
-      darkTheme:
-          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.yellow),
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      debugShowCheckedModeBanner: false,
-      supportedLocales: [
-        const Locale('en'),
-        const Locale('de'),
-      ],
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        "/": (BuildContext context) => MainScreen(),
-        "/settings": (BuildContext context) => SettingsScreen()
-      },
-    );
+        title: 'Vs.',
+        theme: ThemeData(primarySwatch: Colors.yellow),
+        darkTheme: ThemeData(
+            brightness: Brightness.dark, primarySwatch: Colors.yellow),
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        debugShowCheckedModeBanner: false,
+        supportedLocales: [
+          const Locale('en'),
+          const Locale('de'),
+        ],
+        initialRoute: '/',
+        onGenerateRoute: (RouteSettings settings) {
+          print('Build route for ${settings.name}');
+          var routes = <String, WidgetBuilder>{
+            "/": (context) => MainScreen(settings.arguments),
+            "/settings": (context) => SettingsScreen(),
+          };
+          WidgetBuilder builder = routes[settings.name];
+          return MaterialPageRoute(builder: (context) => builder(context));
+        });
   }
 }

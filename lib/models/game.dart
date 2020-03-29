@@ -11,42 +11,46 @@ class Game {
     Colors.yellow
   ];
 
+  int id;
+  String name;
   List<Counter> counter;
   DataStore _store;
 
-  Game(store, counter) {
-    this._store = store;
-    this.counter = counter;
+  Game(this.id, this.name, this._store, this.counter);
+
+  factory Game.fromMap(int id, DataStore store, Map map) {
+    Game game = Game(id, map["name"], store, []);
+    game.counter =
+        map["counter"].map<Counter>((e) => Counter.fromMap(game, e)).toList();
+    return game;
   }
 
-  Game.raw(store, List<int> data) {
-    this._store = store;
-    this.counter = [];
-    for (int i in data) {
-      _addCounter(i);
-    }
-  }
+  Game.simple(DataStore store) : this(-1, "", store, []);
 
   reset() {
     counter = [];
     addCounter();
   }
 
+  Counter _getCounter() {
+    return new Counter(0, colors[counter.length], this);
+  }
+
   isAddCounter() {
     return counter.length < colors.length;
   }
 
-  addCounter() {
-    _addCounter(0);
-  }
-
   _addCounter(int number) {
     if (isAddCounter()) {
-      Counter newCounter = new Counter(colors[counter.length], this);
+      Counter newCounter = _getCounter();
       newCounter.number = number;
       counter.add(newCounter);
       save();
     }
+  }
+
+  addCounter() {
+    _addCounter(0);
   }
 
   bool isRemoveCounter() {
@@ -65,5 +69,9 @@ class Game {
 
   save() {
     _store.saveGame(this);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"name": name, "counter": counter.map((e) => e.toMap())};
   }
 }
