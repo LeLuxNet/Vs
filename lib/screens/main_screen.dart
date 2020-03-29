@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:vs/components/counter.dart';
 import 'package:vs/models/counter.dart';
 import 'package:vs/models/game.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/store.dart';
-import 'package:vs/widgets/counter.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -15,23 +16,42 @@ class _MainScreenState extends State<MainScreen> {
   DataStore store;
   bool firstBuild = true;
 
-  static final Choice _resetButton = Choice(title: 'reset');
-  static final List<Choice> _popupMenuButtons = [_resetButton];
+  Choice _resetButton;
+  Choice _settingsButton;
+  List<Choice> _popupMenuButtons;
 
   @override
   void initState() {
-    super.initState();
     store = new DataStore();
     _game = store.getGame();
+
+    _resetButton = Choice(
+        title: 'reset',
+        onSelect: () async {
+          Game game = await _game;
+          setState(() {
+            game.reset();
+          });
+        });
+    _settingsButton = Choice(
+        title: 'settings',
+        onSelect: () => Navigator.pushNamed(context, '/settings'));
+    _popupMenuButtons = [_resetButton, _settingsButton];
+    super.initState();
   }
 
-  void _selectPopupMenu(Choice choice) async {
-    if (choice == _resetButton) {
-      Game game = await _game;
-      setState(() {
-        game.reset();
-      });
-    }
+  _getPopupMenu() {
+    return PopupMenuButton<Choice>(
+      onSelected: (choice) => choice.onSelect(),
+      itemBuilder: (BuildContext context) {
+        return _popupMenuButtons.map((Choice choice) {
+          return PopupMenuItem<Choice>(
+            value: choice,
+            child: Text(AppLocalizations.of(context).translate(choice.title)),
+          );
+        }).toList();
+      },
+    );
   }
 
   Widget _getCounterWidget(Counter data, int id) {
@@ -56,46 +76,58 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  Widget _getAppBarIcon(bool add) {
+    return new FutureBuilder<Game>(
+        future: _game,
+        builder: (context, snapshot) {
+          return IconButton(
+              icon: Icon(add ? Icons.add : Icons.remove),
+              onPressed: () {
+                if (snapshot.hasData) {
+                  if (add
+                      ? snapshot.data.isAddCounter()
+                      : snapshot.data.isRemoveCounter()) {
+                    return add
+                        ? () => setState(snapshot.data.addCounter)
+                        : () => setState(snapshot.data.removeCounter);
+                  }
+                }
+                return null;
+              }());
+        });
+  }
+
+  Widget _getDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Text(AppLocalizations.of(context).translate("appName")),
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+          ),
+          ListTile(
+            leading: Icon(MdiIcons.dice3),
+            title: Text('Game'),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(AppLocalizations.of(context).translate("appName")),
           actions: <Widget>[
-            new FutureBuilder<Game>(
-                future: _game,
-                builder: (context, snapshot) {
-                  return IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed:
-                          snapshot.hasData && snapshot.data.isAddCounter()
-                              ? () => setState(snapshot.data.addCounter)
-                              : null);
-                }),
-            new FutureBuilder<Game>(
-                future: _game,
-                builder: (context, snapshot) {
-                  return IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed:
-                          snapshot.hasData && snapshot.data.isRemoveCounter()
-                              ? () => setState(snapshot.data.removeCounter)
-                              : null);
-                }),
-            PopupMenuButton<Choice>(
-              onSelected: _selectPopupMenu,
-              itemBuilder: (BuildContext context) {
-                return _popupMenuButtons.map((Choice choice) {
-                  return PopupMenuItem<Choice>(
-                    value: choice,
-                    child: Text(
-                        AppLocalizations.of(context).translate(choice.title)),
-                  );
-                }).toList();
-              },
-            ),
+            _getAppBarIcon(true),
+            _getAppBarIcon(false),
+            _getPopupMenu()
           ],
         ),
+        drawer: _getDrawer(),
         body: new FutureBuilder<Game>(
             future: _game,
             builder: (context, snapshot) {
@@ -109,7 +141,8 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class Choice {
-  Choice({this.title});
+  Choice({this.title, this.onSelect});
 
   final String title;
+  final Function onSelect;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vs/screens/main_screen.dart';
+import 'package:vs/screens/settings_screen.dart';
 import 'package:vs/services/localization.dart';
 
 void main() => runApp(MyApp());
@@ -11,7 +12,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vs.',
       theme: ThemeData(primarySwatch: Colors.yellow),
-      darkTheme: ThemeData.dark(),
+      darkTheme:
+          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.yellow),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -24,7 +26,8 @@ class MyApp extends StatelessWidget {
       ],
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        "/": (BuildContext context) => MainScreen()
+        "/": (BuildContext context) => MainScreen(),
+        "/settings": (BuildContext context) => SettingsScreen()
       },
     );
   }

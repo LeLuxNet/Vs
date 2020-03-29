@@ -16,8 +16,8 @@ class CounterWidget extends StatefulWidget {
 
 class _CounterWidgetState extends State<CounterWidget>
     with TickerProviderStateMixin {
-  static final BorderRadius borderRadius = BorderRadius.only(
-      bottomRight: Radius.circular(15), topLeft: Radius.circular(15));
+  static final BorderRadius borderRadius =
+      BorderRadius.all(Radius.circular(15));
 
   bool visible = false;
 

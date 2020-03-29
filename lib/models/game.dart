@@ -12,15 +12,15 @@ class Game {
   ];
 
   List<Counter> counter;
-  DataStore store;
+  DataStore _store;
 
   Game(store, counter) {
-    this.store = store;
+    this._store = store;
     this.counter = counter;
   }
 
   Game.raw(store, List<int> data) {
-    this.store = store;
+    this._store = store;
     this.counter = [];
     for (int i in data) {
       _addCounter(i);
@@ -64,6 +64,6 @@ class Game {
   }
 
   save() {
-    store.saveGame(this);
+    _store.saveGame(this);
   }
 }
