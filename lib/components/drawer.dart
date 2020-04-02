@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vs/models/game.dart';
+import 'package:vs/screens/game_screen.dart';
+import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
-import 'package:vs/services/store.dart';
+import 'package:vs/services/service_locator.dart';
 
 class DrawerWidget extends StatefulWidget {
-  DataStore store;
+  DataService _dataService = locator<DataService>();
 
-  DrawerWidget(this.store);
+  DrawerWidget();
 
   @override
   _DrawerWidgetState createState() => _DrawerWidgetState();
@@ -18,7 +20,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   void initState() {
-    _games = widget.store.getGames();
+    _games = widget._dataService.getGames();
+    _games.then((value) => print(
+        "Available Games: " + value.map((v) => v.id).toList().toString()));
   }
 
   @override
@@ -29,8 +33,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             builder: (context, snapshot) {
               List<Widget> entries = [
                 DrawerHeader(
-                  child:
-                      Text(AppLocalizations.of(context).translate("appName")),
+                  child: Text(AppLocalizations.of(context).translate("appName")),
                   decoration:
                       BoxDecoration(color: Theme.of(context).primaryColor),
                 ),
@@ -40,10 +43,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   entries.add(ListTile(
                       leading: Icon(MdiIcons.fromString(
                           "dice" + e.counter.length.toString())),
-                      title: Text(e.name),
+                      title: Text(e.getName(AppLocalizations.of(context))),
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, "/",
-                            arguments: e.id);
+                        Navigator.pushReplacementNamed(
+                            context, GameScreen.navigationName,
+                            arguments: Future.value(e));
                       }));
                 });
               }
@@ -52,9 +56,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   title:
                       Text(AppLocalizations.of(context).translate("newGame")),
                   onTap: () {
-                    widget.store.createGame(context).then((game) =>
-                        Navigator.pushReplacementNamed(context, "/",
-                            arguments: game.id));
+                    Navigator.pushReplacementNamed(
+                        context, GameScreen.navigationName,
+                        arguments: widget._dataService.createGame());
                   }));
               return ListView(padding: EdgeInsets.zero, children: entries);
             }));

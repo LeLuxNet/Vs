@@ -1,18 +1,19 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:vs/models/game.dart';
-import 'package:vs/services/localization.dart';
+import 'package:vs/services/data_service.dart';
 
-class DataStore {
+class DataServiceDatabase extends DataService {
+
   static final String dbFile = "data.db";
   static final DatabaseFactory dbFactory = databaseFactoryIo;
 
   static final String gameStoreName = "games";
+  static final String lastOpenGameRecordName = "lastOpenGame";
 
   Database _db;
 
@@ -26,35 +27,45 @@ class DataStore {
     return _db;
   }
 
-  Future<Game> getGame(int id, bool setLast) async {
-    if (id == null) {
-      id = await _getLastOpenGameId();
-    } else if (setLast) {
-      _setLastOpenGameId(id);
-    }
+  @override
+  Future<Game> createGame() async {
     var store = intMapStoreFactory.store(gameStoreName);
     Database db = await _getInstance();
-    Map map = await store.record(id).get(db);
-    return Game.fromMap(id, this, map);
-  }
-
-  Future<List<Game>> getGames() async {
-    var store = intMapStoreFactory.store(gameStoreName);
-    Database db = await _getInstance();
-    List<int> keys = await store.findKeys(db);
-    return Future.wait(keys.map((e) => getGame(e, false)).toList());
-  }
-
-  Future<Game> createGame(BuildContext context) async {
-    var store = intMapStoreFactory.store(gameStoreName);
-    Database db = await _getInstance();
-    Game game = Game.simple(this);
+    Game game = Game.simple();
     game.id = await store.add(db, game.toMap());
-    game.name = AppLocalizations.of(context).translate("newGame") + " (" + game.id.toString() + ")";
     game.addCounter();
     return game;
   }
 
+  @override
+  Future<Game> deleteGame(int id) async {
+    var store = intMapStoreFactory.store(gameStoreName);
+    Database db = await _getInstance();
+    await store.record(id).delete(db);
+    int newId = await _calculateGameId();
+    return await getGame(newId);
+  }
+
+  @override
+  Future<Game> getGame(int id) async {
+    if (id == null) {
+      id = await _getLastOpenGameId();
+    }
+    var store = intMapStoreFactory.store(gameStoreName);
+    Database db = await _getInstance();
+    Map map = await store.record(id).get(db);
+    return Game.fromMap(id, map);
+  }
+
+  @override
+  Future<List<Game>> getGames() async {
+    var store = intMapStoreFactory.store(gameStoreName);
+    Database db = await _getInstance();
+    List<int> keys = await store.findKeys(db);
+    return Future.wait(keys.map((e) => getGame(e)).toList());
+  }
+
+  @override
   saveGame(Game game) async {
     var store = intMapStoreFactory.store(gameStoreName);
     Database db = await _getInstance();
@@ -64,18 +75,31 @@ class DataStore {
   Future<int> _getLastOpenGameId() async {
     var store = StoreRef.main();
     Database db = await _getInstance();
-    int id = await store.record("lastOpenGame").get(db);
+    int id = await store.record(lastOpenGameRecordName).get(db);
     if (id == null) {
-      List<Game> games = await getGames();
-      id = games.first.id;
-      _setLastOpenGameId(id);
+      id = await _calculateGameId();
     }
     return id;
   }
 
-  _setLastOpenGameId(int id) async {
+  Future<int> _calculateGameId() async {
+    List<Game> games = await getGames();
+    int id;
+    if (games.length == 0) {
+      Game game = await createGame();
+      id = game.id;
+    } else {
+      id = games.first.id;
+    }
+    await setLastOpenGameId(id);
+    return id;
+  }
+
+  @override
+  setLastOpenGameId(int id) async {
     var store = StoreRef.main();
     Database db = await _getInstance();
-    await store.record("lastOpenGame").put(db, id);
+    await store.record(lastOpenGameRecordName).put(db, id);
+    print("Last Game: $id");
   }
 }

@@ -1,58 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vs/components/counter.dart';
 import 'package:vs/components/drawer.dart';
 import 'package:vs/models/counter.dart';
 import 'package:vs/models/game.dart';
+import 'package:vs/screens/game_settings_screen.dart';
+import 'package:vs/screens/settings_screen.dart';
+import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
-import 'package:vs/services/store.dart';
+import 'package:vs/services/service_locator.dart';
 
-class MainScreen extends StatefulWidget {
-  int id;
+class GameScreen extends StatefulWidget {
+  static final String navigationName = "/game";
 
-  MainScreen(this.id);
+  Future<Game> game;
+
+  GameScreen(this.game);
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _GameScreenState createState() => _GameScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  Future<Game> _game;
-  DataStore store;
-
+class _GameScreenState extends State<GameScreen> {
   bool firstBuild = true;
   String _title = "";
 
-  Choice _resetButton;
+  Choice _editButton;
   Choice _settingsButton;
   List<Choice> _popupMenuButtons;
 
+  DataService _dataService = locator<DataService>();
+
   @override
   void initState() {
-    store = new DataStore();
-
-    print("GameId: " + widget.id.toString());
-
-    if (widget.id == null) {
-      widget.id = 1;
+    if (widget.game == null) {
+      widget.game = _dataService.getGame(null);
     }
 
-    _game = store.getGame(widget.id, true);
+    widget.game.then((value) {
+      setState(() => _title = value.getName(AppLocalizations.of(context)));
+      _dataService.setLastOpenGameId(value.id);
+      print("GameId: " + value.id.toString());
+    });
 
-    _game.then((value) => setState(() => _title = value.name));
-
-    _resetButton = Choice(
-        title: 'reset',
+    _editButton = Choice(
+        title: 'editGame',
         onSelect: () async {
-          Game game = await _game;
-          setState(() {
-            game.reset();
-          });
+          Game game = await widget.game;
+          Navigator.pushNamed(context, GameSettingsScreen.navigationName,
+              arguments: game);
         });
     _settingsButton = Choice(
         title: 'settings',
-        onSelect: () => Navigator.pushNamed(context, '/settings'));
-    _popupMenuButtons = [_resetButton, _settingsButton];
+        onSelect: () =>
+            Navigator.pushNamed(context, SettingsScreen.navigationName));
+    _popupMenuButtons = [_editButton, _settingsButton];
     super.initState();
   }
 
@@ -94,7 +95,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _getAppBarIcon(bool add) {
     return new FutureBuilder<Game>(
-        future: _game,
+        future: widget.game,
         builder: (context, snapshot) {
           return IconButton(
               icon: Icon(add ? Icons.add : Icons.remove),
@@ -124,9 +125,9 @@ class _MainScreenState extends State<MainScreen> {
             _getPopupMenu()
           ],
         ),
-        drawer: DrawerWidget(store),
+        drawer: DrawerWidget(),
         body: new FutureBuilder<Game>(
-            future: _game,
+            future: widget.game,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return _getOrientationBasedWidget(

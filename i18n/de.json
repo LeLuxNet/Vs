@@ -1,6 +1,9 @@
 {
   "appName": "Vs.",
   "settings": "Einstellungen",
-  "reset": "Zurücksetzen",
-  "newGame": "Neues Spiel"
+  "restartGame": "Spiel neustarten",
+  "deleteGame": "Spiel löschen",
+  "editGame": "Spiel bearbeiten",
+  "newGame": "Neues Spiel",
+  "dangerousZone": "Gefähliche Zone"
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:vs/services/localization.dart';
 
 class SettingsScreen extends StatefulWidget {
+
+  static final String navigationName = "/settings";
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }

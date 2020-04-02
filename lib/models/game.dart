@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:vs/services/store.dart';
+import 'package:vs/services/data_service.dart';
+import 'package:vs/services/localization.dart';
+import 'package:vs/services/service_locator.dart';
 
 import 'counter.dart';
 
-class Game {
+class Game extends ChangeNotifier {
   static final List<Color> colors = [
     Colors.red,
     Colors.blue,
@@ -14,18 +16,27 @@ class Game {
   int id;
   String name;
   List<Counter> counter;
-  DataStore _store;
 
-  Game(this.id, this.name, this._store, this.counter);
+  DataService _dataService = locator<DataService>();
 
-  factory Game.fromMap(int id, DataStore store, Map map) {
-    Game game = Game(id, map["name"], store, []);
+  Game(this.id, this.name, this.counter);
+
+  factory Game.fromMap(int id, Map map) {
+    Game game = Game(id, map["name"], []);
     game.counter =
         map["counter"].map<Counter>((e) => Counter.fromMap(game, e)).toList();
     return game;
   }
 
-  Game.simple(DataStore store) : this(-1, "", store, []);
+  Game.simple() : this(-1, "", []);
+
+  String getName(AppLocalizations localizations) {
+    if (name == "") {
+      return localizations.translate("newGame") +
+          (id == 1 ? "" : " (" + id.toString() + ")");
+    }
+    return name;
+  }
 
   reset() {
     counter = [];
@@ -45,6 +56,7 @@ class Game {
       Counter newCounter = _getCounter();
       newCounter.number = number;
       counter.add(newCounter);
+      notifyListeners();
       save();
     }
   }
@@ -61,6 +73,7 @@ class Game {
   removeCounter() {
     if (counter.length > 1) {
       counter.removeLast();
+      notifyListeners();
       save();
     } else if (counter.length == 1) {
       reset();
@@ -68,7 +81,13 @@ class Game {
   }
 
   save() {
-    _store.saveGame(this);
+    _dataService.saveGame(this);
+  }
+
+  Future<Game> delete() {
+    Future<Game> game = _dataService.deleteGame(id);
+    notifyListeners();
+    return game;
   }
 
   Map<String, dynamic> toMap() {

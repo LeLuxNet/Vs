@@ -1,6 +1,9 @@
 {
   "appName": "Vs.",
   "settings": "Settings",
-  "reset": "Reset",
-  "newGame": "New game"
+  "restartGame": "Restart game",
+  "deleteGame": "Delete game",
+  "editGame": "Edit game",
+  "newGame": "New game",
+  "dangerousZone": "Dangerous zone"
 }
