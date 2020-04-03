@@ -23,29 +23,40 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
         appBar: AppBar(
             title: Text(AppLocalizations.of(context).translate("editGame"))),
         body: ListView(children: <Widget>[
-          ListSection(AppLocalizations.of(context).translate("dangerousZone"), [
-            ListTile(
-              title: Text(AppLocalizations.of(context).translate("restartGame")),
-              leading: Icon(Icons.refresh),
-              onTap: () {
-                setState(() {
-                  widget.game.restart();
-                  Navigator.pop(context);
-                });
-              },
-            ),
-            ListTile(
-              title: Text(AppLocalizations.of(context).translate("deleteGame")),
-              leading: Icon(Icons.delete),
-              onTap: () {
-                setState(() {
-                  Navigator.pushReplacementNamed(
-                      context, GameScreen.navigationName,
-                      arguments: widget.game.delete());
-                });
-              },
-            )
-          ], color: Colors.red)
+          SwitchListTile(
+              title: Text(
+                  AppLocalizations.of(context).translate("negativeAllowed")),
+              secondary: Icon(Icons.remove_circle),
+              value: widget.game.negativeAllowed,
+              onChanged: widget.game.setNegativeAllowed),
+          ListSection(
+              AppLocalizations.of(context).translate("dangerousZone"),
+              [
+                ListTile(
+                  title: Text(
+                      AppLocalizations.of(context).translate("restartGame")),
+                  leading: Icon(Icons.refresh),
+                  onTap: () {
+                    setState(() {
+                      widget.game.restart();
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Text(
+                      AppLocalizations.of(context).translate("deleteGame")),
+                  leading: Icon(Icons.delete),
+                  onTap: () {
+                    setState(() {
+                      Navigator.pushReplacementNamed(
+                          context, GameScreen.navigationName,
+                          arguments: widget.game.delete());
+                    });
+                  },
+                )
+              ],
+              color: Colors.red)
         ]));
   }
 }

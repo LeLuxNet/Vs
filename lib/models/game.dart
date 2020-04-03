@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
@@ -8,27 +10,37 @@ import 'counter.dart';
 class Game extends ChangeNotifier {
   static final List<Color> colors = [
     Colors.red,
+    Colors.pink,
+    Colors.purple,
     Colors.blue,
+    Colors.lightBlue[300],
+    Colors.lime,
     Colors.green,
-    Colors.yellow
+    Colors.orange,
+    Colors.yellow,
+    Colors.white,
+    Colors.black
   ];
+
+  final int maxPlayers = 4;
 
   int id;
   String name;
   List<Counter> counter;
+  bool negativeAllowed;
 
   DataService _dataService = locator<DataService>();
 
-  Game(this.id, this.name, this.counter);
+  Game(this.id, this.name, this.counter, this.negativeAllowed);
 
   factory Game.fromMap(int id, Map map) {
-    Game game = Game(id, map["name"], []);
+    Game game = Game(id, map["name"], [], map["negativeAllowed"] ?? false);
     game.counter =
         map["counter"].map<Counter>((e) => Counter.fromMap(game, e)).toList();
     return game;
   }
 
-  Game.simple() : this(-1, "", []);
+  Game.simple() : this(-1, "", [], false);
 
   String getName(AppLocalizations localizations) {
     if (name == "") {
@@ -38,16 +50,35 @@ class Game extends ChangeNotifier {
     return name;
   }
 
+  void setNegativeAllowed(bool value) {
+    counter.forEach((e) {
+      if(e.number < 0) {
+        e.number = 0;
+      }
+    });
+    negativeAllowed = value;
+  }
+
   restart() {
     counter.forEach((c) => c.reset());
   }
 
+  int _generateColor() {
+    List<int> freeColors = [];
+    for(int i = 0; i < colors.length; i++) {
+      freeColors.add(i);
+    }
+    counter.forEach((c) => freeColors.remove(c.color));
+    Random random = new Random();
+    return freeColors[random.nextInt(freeColors.length)];
+  }
+
   Counter _getCounter() {
-    return new Counter(0, colors[counter.length], this);
+    return new Counter(0, _generateColor(), this);
   }
 
   isAddCounter() {
-    return counter.length < colors.length;
+    return counter.length < maxPlayers;
   }
 
   _addCounter(int number) {
@@ -65,8 +96,8 @@ class Game extends ChangeNotifier {
   }
 
   bool isRemoveCounter() {
-    return counter.length > 1 ||
-        (counter.length == 1 && counter[0].number != 0);
+    // May some tests later
+    return true;
   }
 
   removeCounter() {
@@ -75,7 +106,9 @@ class Game extends ChangeNotifier {
       notifyListeners();
       save();
     } else if (counter.length == 1) {
-      counter.first.reset();
+      Counter first = counter.first;
+      first.color = _generateColor();
+      first.reset();
     }
   }
 
@@ -90,6 +123,6 @@ class Game extends ChangeNotifier {
   }
 
   Map<String, dynamic> toMap() {
-    return {"name": name, "counter": counter.map((e) => e.toMap())};
+    return {"name": name, "counter": counter.map((e) => e.toMap()), "negativeAllowed": negativeAllowed};
   }
 }

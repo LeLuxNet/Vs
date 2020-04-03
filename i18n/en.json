@@ -5,5 +5,6 @@
   "deleteGame": "Delete game",
   "editGame": "Edit game",
   "newGame": "New game",
-  "dangerousZone": "Dangerous zone"
+  "dangerousZone": "Dangerous zone",
+  "negativeAllowed": "Negative numbers allowed"
 }

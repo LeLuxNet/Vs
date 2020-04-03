@@ -36,7 +36,7 @@ class _CounterWidgetState extends State<CounterWidget>
         shape: RoundedRectangleBorder(
           borderRadius: borderRadius,
         ),
-        color: widget.data.color,
+        color: widget.data.getColor(),
         child: Listener(
           onPointerUp: (PointerUpEvent e) {
             // Detect if the left or the right side has been taped
@@ -57,7 +57,11 @@ class _CounterWidgetState extends State<CounterWidget>
             onTap: () {},
             child: Center(
                 child: Text(widget.data.number.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 50))),
+                    style: TextStyle(
+                        color: _isLightBackground(widget.data.getColor())
+                            ? Colors.black
+                            : Colors.white,
+                        fontSize: 50))),
           ),
         ),
       ),
@@ -78,5 +82,9 @@ class _CounterWidgetState extends State<CounterWidget>
   Widget build(BuildContext context) {
     _setVisible();
     return Expanded(child: getAnimation());
+  }
+
+  bool _isLightBackground(Color color) {
+    return (color.red * 0.299 + color.green * 0.587 + color.blue * 0.114) > 186;
   }
 }

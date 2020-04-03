@@ -4,13 +4,19 @@ import 'game.dart';
 
 class Counter {
   int number;
-  Color color;
+  int color;
   Game game;
 
   Counter(this.number, this.color, this.game);
 
   Counter.fromMap(Game game, Map map)
-      : this(map["number"], Color(map["color"]), game);
+      : this(
+            map["number"],
+            // Backward compatible
+            map["color"] > Game.colors.length
+                ? Game.colors.indexWhere((e) => e.value == map["color"])
+                : map["color"],
+            game);
 
   add() {
     number++;
@@ -18,10 +24,15 @@ class Counter {
   }
 
   remove() {
-    if (number > 0) {
+    if (number > 0 || game.negativeAllowed) {
       number--;
       game.save();
     }
+  }
+
+  getColor() {
+    print(color);
+    return Game.colors[color];
   }
 
   reset() {
@@ -29,6 +40,6 @@ class Counter {
   }
 
   Map<String, dynamic> toMap() {
-    return {"number": number, "color": color.value};
+    return {"number": number, "color": color};
   }
 }
