@@ -38,9 +38,8 @@ class Game extends ChangeNotifier {
     return name;
   }
 
-  reset() {
-    counter = [];
-    addCounter();
+  restart() {
+    counter.forEach((c) => c.reset());
   }
 
   Counter _getCounter() {
@@ -76,7 +75,7 @@ class Game extends ChangeNotifier {
       notifyListeners();
       save();
     } else if (counter.length == 1) {
-      reset();
+      counter.first.reset();
     }
   }
 
