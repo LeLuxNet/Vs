@@ -33,7 +33,7 @@ class DataServiceDatabase extends DataService {
     Database db = await _getInstance();
     Game game = Game.simple();
     game.id = await store.add(db, game.toMap());
-    game.addCounter();
+    game.save();
     return game;
   }
 

@@ -47,18 +47,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget _getItemList() {
-    return Expanded(
-      child: FutureBuilder<List<Game>>(
-          future: _games,
-          builder: (context, snapshot) {
-            List<Widget> entries = [_getDrawerHead()];
-            if (snapshot.hasData) {
-              snapshot.data.forEach((e) => entries.add(_getGameButton(e)));
-            }
-            entries.add(_getNewGameButton());
-            return ListView(padding: EdgeInsets.zero, children: entries);
-          }),
-    );
+    return FutureBuilder<List<Game>>(
+        future: _games,
+        builder: (context, snapshot) {
+          List<Widget> entries = [_getDrawerHead()];
+          if (snapshot.hasData) {
+            snapshot.data.forEach((e) => entries.add(_getGameButton(e)));
+          }
+          entries.add(_getNewGameButton());
+          return ListView(padding: EdgeInsets.zero, children: entries);
+        });
   }
 
   Widget _getGameButton(Game game) {

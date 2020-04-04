@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:vs/models/colors.dart';
 
 import 'game.dart';
 
 class Counter {
   int number;
-  int color;
+  PlayerColor color;
   Game game;
 
-  Counter(this.number, this.color, this.game);
+  Counter(number, this.color, this.game) {
+    if(number == null) {
+      this.number = this.game.gameType.startNumber;
+    } else {
+      this.number = number;
+    }
+  }
 
   Counter.fromMap(Game game, Map map)
       : this(
-            map["number"],
-            // Backward compatible
-            map["color"] > Game.colors.length
-                ? Game.colors.indexWhere((e) => e.value == map["color"])
-                : map["color"],
+            map["number"] ?? game.gameType.startNumber,
+            // Backwards compatibility to version 0.2.1
+            game.gameType
+                .colors[map["color"] > 6 ? 0 : map["color"]],
             game);
 
   add() {
@@ -24,22 +30,21 @@ class Counter {
   }
 
   remove() {
-    if (number > 0 || game.negativeAllowed) {
+    if (game.negativeAllowed || number > 0) {
       number--;
       game.save();
     }
   }
 
-  getColor() {
-    print(color);
-    return Game.colors[color];
+  Color getColor() {
+    return color.color;
   }
 
   reset() {
-    number = 0;
+    number = game.gameType.startNumber;
   }
 
   Map<String, dynamic> toMap() {
-    return {"number": number, "color": color};
+    return {"number": number, "color": color.id};
   }
 }

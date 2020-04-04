@@ -6,5 +6,10 @@
   "editGame": "Spiel bearbeiten",
   "newGame": "Neues Spiel",
   "dangerousZone": "Gefähliche Zone",
-  "negativeAllowed": "Negative Zahlen erlaubt"
+  "negativeAllowed": "Negative Zahlen erlaubt",
+  "gameTypeSelection": "Spielauswahl",
+
+  "gameType_normal": "Normal",
+  "gameType_catan": "Siedler von Catan",
+  "gameType_life": "Spiel des Lebens"
 }

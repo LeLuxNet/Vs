@@ -37,6 +37,11 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     widget.game.then((value) {
+      if (value.counter.length == 0) {
+        Navigator.pushReplacementNamed(
+            context, GameSettingsScreen.navigationName,
+            arguments: {"game": value, "new": true});
+      }
       setState(() => _title = value.getName(AppLocalizations.of(context)));
       _dataService.setLastOpenGameId(value.id);
       print("GameId: " + value.id.toString());
@@ -47,7 +52,7 @@ class _GameScreenState extends State<GameScreen> {
         onSelect: () async {
           Game game = await widget.game;
           Navigator.pushNamed(context, GameSettingsScreen.navigationName,
-              arguments: game);
+              arguments: {"game": game, "new": false});
         });
     _settingsButton = Choice(
         title: 'settings',

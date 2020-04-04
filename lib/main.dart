@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Vs.',
+        title: "Vs.",
         theme: ThemeData(primarySwatch: Colors.yellow),
         darkTheme:
             ThemeData(brightness: Brightness.dark, accentColor: Colors.grey),
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             GameScreen.navigationName: (context) =>
                 GameScreen(settings.arguments),
             GameSettingsScreen.navigationName: (context) =>
-                GameSettingsScreen(settings.arguments),
+                GameSettingsScreen.args(settings.arguments),
             SettingsScreen.navigationName: (context) => SettingsScreen(),
           };
           WidgetBuilder builder = routes[settings.name];

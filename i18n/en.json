@@ -6,5 +6,10 @@
   "editGame": "Edit game",
   "newGame": "New game",
   "dangerousZone": "Dangerous zone",
-  "negativeAllowed": "Negative numbers allowed"
+  "negativeAllowed": "Negative numbers allowed",
+  "gameTypeSelection": "Game selection",
+
+  "gameType_normal": "Normal",
+  "gameType_catan": "Settlers of Catan",
+  "gameType_life": "The Game of Live"
 }

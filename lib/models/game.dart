@@ -1,46 +1,49 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:vs/models/game_type.dart';
 import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/service_locator.dart';
 
+import 'colors.dart';
 import 'counter.dart';
 
 class Game extends ChangeNotifier {
   static final List<Color> colors = [
-    Colors.red,
+    PlayerColors.red.color,
     Colors.pink,
     Colors.purple,
-    Colors.blue,
+    PlayerColors.blue.color,
     Colors.lightBlue[300],
     Colors.lime,
-    Colors.green,
+    PlayerColors.green.color,
     Colors.orange,
-    Colors.yellow,
-    Colors.white,
-    Colors.black
+    PlayerColors.yellow.color,
+    PlayerColors.white.color,
+    PlayerColors.black.color
   ];
-
-  final int maxPlayers = 4;
 
   int id;
   String name;
   List<Counter> counter;
   bool negativeAllowed;
+  GameType gameType;
 
+  static final Random _random = new Random();
   DataService _dataService = locator<DataService>();
 
-  Game(this.id, this.name, this.counter, this.negativeAllowed);
+  Game(this.id, this.name, this.counter, this.gameType, this.negativeAllowed);
 
   factory Game.fromMap(int id, Map map) {
-    Game game = Game(id, map["name"], [], map["negativeAllowed"] ?? false);
+    Game game = Game(id, map["name"] ?? "", [], GameType.list[map["gameType"] ?? 0],
+        map["negativeAllowed"] ?? false);
     game.counter =
         map["counter"].map<Counter>((e) => Counter.fromMap(game, e)).toList();
     return game;
   }
 
-  Game.simple() : this(-1, "", [], false);
+  Game.simple() : this(-1, "", [], GameType.normal, false);
 
   String getName(AppLocalizations localizations) {
     if (name == "") {
@@ -52,7 +55,7 @@ class Game extends ChangeNotifier {
 
   void setNegativeAllowed(bool value) {
     counter.forEach((e) {
-      if(e.number < 0) {
+      if (e.number < 0) {
         e.number = 0;
       }
     });
@@ -63,28 +66,24 @@ class Game extends ChangeNotifier {
     counter.forEach((c) => c.reset());
   }
 
-  int _generateColor() {
-    List<int> freeColors = [];
-    for(int i = 0; i < colors.length; i++) {
-      freeColors.add(i);
-    }
+  PlayerColor _generateColor() {
+    List<PlayerColor> freeColors = [];
+    freeColors.addAll(gameType.colors);
     counter.forEach((c) => freeColors.remove(c.color));
-    Random random = new Random();
-    return freeColors[random.nextInt(freeColors.length)];
+    return freeColors[_random.nextInt(freeColors.length)];
   }
 
-  Counter _getCounter() {
-    return new Counter(0, _generateColor(), this);
+  Counter _getCounter(int number) {
+    return Counter(number, _generateColor(), this);
   }
 
   isAddCounter() {
-    return counter.length < maxPlayers;
+    return counter.length < gameType.colors.length;
   }
 
   _addCounter(int number) {
     if (isAddCounter()) {
-      Counter newCounter = _getCounter();
-      newCounter.number = number;
+      Counter newCounter = _getCounter(number);
       counter.add(newCounter);
       notifyListeners();
       save();
@@ -92,7 +91,7 @@ class Game extends ChangeNotifier {
   }
 
   addCounter() {
-    _addCounter(0);
+    _addCounter(null);
   }
 
   bool isRemoveCounter() {
@@ -123,6 +122,11 @@ class Game extends ChangeNotifier {
   }
 
   Map<String, dynamic> toMap() {
-    return {"name": name, "counter": counter.map((e) => e.toMap()), "negativeAllowed": negativeAllowed};
+    return {
+      "name": name,
+      "counter": counter.map((e) => e.toMap()),
+      "gameType": GameType.list.indexOf(gameType),
+      "negativeAllowed": negativeAllowed
+    };
   }
 }
