@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:vs/models/game_type.dart';
+import 'package:vs/models/gametype/game_type.dart';
 import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/service_locator.dart';
 
-import 'colors.dart';
 import 'counter.dart';
+import 'gametype/colors.dart';
 
 class Game extends ChangeNotifier {
   static final List<Color> colors = [

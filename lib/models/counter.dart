@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vs/models/colors.dart';
+import 'package:vs/models/gametype/colors.dart';
 
 import 'game.dart';
 
@@ -21,7 +21,9 @@ class Counter {
             map["number"] ?? game.gameType.startNumber,
             // Backwards compatibility to version 0.2.1
             game.gameType
-                .colors[map["color"] > 6 ? 0 : map["color"]],
+                .colors[map["color"] >= game.gameType.colors.length
+                ? 0
+                : map["color"]],
             game);
 
   add() {

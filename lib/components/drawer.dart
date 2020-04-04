@@ -1,9 +1,5 @@
-import 'dart:ffi';
-import 'dart:wasm';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vs/models/game.dart';
 import 'package:vs/screens/game_screen.dart';
 import 'package:vs/services/data_service.dart';
@@ -30,8 +26,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-        child: _getItemList());
+    return Drawer(child: _getItemList());
   }
 
   Widget _getDrawerHead() {
@@ -62,7 +57,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   Widget _getGameButton(Game game) {
     return ListTile(
         leading:
-            Icon(MdiIcons.fromString("dice" + game.counter.length.toString())),
+        Icon(game.gameType.icon),
         title: Text(game.getName(AppLocalizations.of(context))),
         onTap: () {
           Navigator.pushReplacementNamed(context, GameScreen.navigationName,

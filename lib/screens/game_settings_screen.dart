@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vs/components/list_section.dart';
 import 'package:vs/models/game.dart';
-import 'package:vs/models/game_type.dart';
+import 'package:vs/models/gametype/game_type.dart';
 import 'package:vs/screens/game_screen.dart';
 import 'package:vs/services/localization.dart';
 
@@ -30,24 +28,30 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
             title: Text(AppLocalizations.of(context)
                 .translate(widget.newGame ? "newGame" : "editGame"))),
         body: ListView(children: <Widget>[
-          ListTile(
-              title: Text(AppLocalizations.of(context)
-                  .translate(widget.game.gameType.getI18nName())),
-              leading: Icon(Icons.videogame_asset),
-              onTap: widget.newGame ? _showGameTypeDialog : null),
-          SwitchListTile(
-              title: Text(
-                  AppLocalizations.of(context).translate("negativeAllowed")),
-              secondary: Icon(Icons.remove_circle),
-              value: widget.game.negativeAllowed,
-              onChanged: widget.game.setNegativeAllowed),
+          ListSection(AppLocalizations.of(context).translate("general"), [
+            ListTile(
+                title: Text(widget.game.getName(AppLocalizations.of(context))),
+                leading: Icon(Icons.text_fields),
+                onTap: () {}),
+            ListTile(
+                title: Text(AppLocalizations.of(context)
+                    .translate(widget.game.gameType.getI18nName())),
+                leading: Icon(Icons.videogame_asset),
+                onTap: widget.newGame ? _showGameTypeDialog : null),
+            SwitchListTile(
+                title: Text(
+                    AppLocalizations.of(context).translate("negativeAllowed")),
+                secondary: Icon(Icons.remove_circle),
+                value: widget.game.negativeAllowed,
+                onChanged: widget.game.setNegativeAllowed)
+          ]),
           _getDangerousZone()
         ]),
         floatingActionButton: _getFab());
   }
 
   Widget _getFab() {
-    if(!widget.newGame) {
+    if (!widget.newGame) {
       return null;
     }
     return FloatingActionButton(
@@ -74,9 +78,12 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
                       onPressed: () => Navigator.pop(context, e)))
                   .toList());
         }).then((gameType) {
-          setState(() {
-            widget.game.gameType = gameType;
-          });
+      if (gameType == null) {
+        return;
+      }
+      setState(() {
+        widget.game.gameType = gameType;
+      });
       widget.game.save();
     });
   }

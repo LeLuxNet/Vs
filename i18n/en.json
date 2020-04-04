@@ -8,6 +8,7 @@
   "dangerousZone": "Dangerous zone",
   "negativeAllowed": "Negative numbers allowed",
   "gameTypeSelection": "Game selection",
+  "general": "General",
 
   "gameType_normal": "Normal",
   "gameType_catan": "Settlers of Catan",

@@ -5,15 +5,11 @@ class ListSection extends Section {
   ListSection(String title, List<Widget> children, {Color color})
       : super(
             title,
-            ListView.separated(
+      ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: children.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1),
-              itemBuilder: (BuildContext context, int index) {
-                return children[index];
-              },
+        itemBuilder: (BuildContext context, int i) => children[i],
             ),
             color: color);
 }

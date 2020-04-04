@@ -38,9 +38,10 @@ class _GameScreenState extends State<GameScreen> {
 
     widget.game.then((value) {
       if (value.counter.length == 0) {
-        Navigator.pushReplacementNamed(
-            context, GameSettingsScreen.navigationName,
+        Navigator.pushNamedAndRemoveUntil(
+            context, GameSettingsScreen.navigationName, (_) => false,
             arguments: {"game": value, "new": true});
+        return;
       }
       setState(() => _title = value.getName(AppLocalizations.of(context)));
       _dataService.setLastOpenGameId(value.id);
