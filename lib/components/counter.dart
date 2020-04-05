@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vs/components/animatedexpanded.dart';
 import 'package:vs/models/counter.dart';
 
 class CounterWidget extends StatefulWidget {
@@ -14,8 +15,7 @@ class CounterWidget extends StatefulWidget {
   }
 }
 
-class _CounterWidgetState extends State<CounterWidget>
-    with TickerProviderStateMixin {
+class _CounterWidgetState extends State<CounterWidget> {
   static final BorderRadius borderRadius =
       BorderRadius.all(Radius.circular(15));
 
@@ -30,39 +30,36 @@ class _CounterWidgetState extends State<CounterWidget>
   }
 
   Widget getCard() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 500),
-      child: Card(
-        shape: RoundedRectangleBorder(
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
+      color: widget.data.getColor(),
+      child: Listener(
+        onPointerUp: (PointerUpEvent e) {
+          // Detect if the left or the right side has been taped
+          RenderBox box = context.findRenderObject();
+          var percent = e.localPosition.dx / box.size.width;
+          if (percent >= 0.5) {
+            setState(() {
+              widget.data.add();
+            });
+          } else {
+            setState(() {
+              widget.data.remove();
+            });
+          }
+        },
+        child: InkWell(
           borderRadius: borderRadius,
-        ),
-        color: widget.data.getColor(),
-        child: Listener(
-          onPointerUp: (PointerUpEvent e) {
-            // Detect if the left or the right side has been taped
-            RenderBox box = context.findRenderObject();
-            var percent = e.localPosition.dx / box.size.width;
-            if (percent >= 0.5) {
-              setState(() {
-                widget.data.add();
-              });
-            } else {
-              setState(() {
-                widget.data.remove();
-              });
-            }
-          },
-          child: InkWell(
-            borderRadius: borderRadius,
-            onTap: () {},
-            child: Center(
-                child: Text(widget.data.number.toString(),
-                    style: TextStyle(
-                        color: _isLightBackground(widget.data.getColor())
-                            ? Colors.black
-                            : Colors.white,
-                        fontSize: 50))),
-          ),
+          onTap: () {},
+          child: Center(
+              child: Text(widget.data.number.toString(),
+                  style: TextStyle(
+                      color: _isLightBackground(widget.data.getColor())
+                          ? Colors.black
+                          : Colors.white,
+                      fontSize: 50))),
         ),
       ),
     );
@@ -81,7 +78,7 @@ class _CounterWidgetState extends State<CounterWidget>
   @override
   Widget build(BuildContext context) {
     _setVisible();
-    return Expanded(child: getAnimation());
+    return AnimatedExpanded(child: getAnimation());
   }
 
   bool _isLightBackground(Color color) {

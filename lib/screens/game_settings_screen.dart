@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vs/components/list_section.dart';
+import 'package:vs/components/promtdialog.dart';
 import 'package:vs/models/game.dart';
 import 'package:vs/models/gametype/game_type.dart';
 import 'package:vs/screens/game_screen.dart';
@@ -32,7 +33,7 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
             ListTile(
                 title: Text(widget.game.getName(AppLocalizations.of(context))),
                 leading: Icon(Icons.text_fields),
-                onTap: () {}),
+                onTap: _showNameDialog),
             ListTile(
                 title: Text(AppLocalizations.of(context)
                     .translate(widget.game.gameType.getI18nName())),
@@ -64,6 +65,18 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
     );
   }
 
+  _showNameDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            PromptDialog(
+                AppLocalizations.of(context).translate("changeName"),
+                AppLocalizations.of(context).translate("name"), (name) {
+              setState(() => widget.game.name = name);
+              widget.game.save();
+            }, value: widget.game.name));
+  }
+
   _showGameTypeDialog() {
     showDialog<GameType>(
         context: context,
@@ -72,10 +85,12 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
               title: Text(
                   AppLocalizations.of(context).translate("gameTypeSelection")),
               children: GameType.list
-                  .map((e) => SimpleDialogOption(
-                      child: Text(AppLocalizations.of(context)
+                  .map((e) =>
+                  ListTile(
+                      leading: Icon(e.icon),
+                      title: Text(AppLocalizations.of(context)
                           .translate(e.getI18nName())),
-                      onPressed: () => Navigator.pop(context, e)))
+                      onTap: () => Navigator.pop(context, e)))
                   .toList());
         }).then((gameType) {
       if (gameType == null) {

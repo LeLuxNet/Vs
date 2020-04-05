@@ -9,6 +9,8 @@
   "negativeAllowed": "Negative numbers allowed",
   "gameTypeSelection": "Game selection",
   "general": "General",
+  "changeName": "Namen ändern",
+  "name": "Name",
 
   "gameType_normal": "Normal",
   "gameType_catan": "Settlers of Catan",
