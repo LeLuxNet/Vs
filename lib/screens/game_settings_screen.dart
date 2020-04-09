@@ -114,10 +114,8 @@ class _GameSettingsScreenState extends State<GameSettingsScreen> {
             title: Text(AppLocalizations.of(context).translate("restartGame")),
             leading: Icon(Icons.refresh),
             onTap: () {
-              setState(() {
-                widget.game.restart();
-                Navigator.pop(context);
-              });
+              widget.game.restart();
+              Navigator.pop(context);
             },
           ),
           ListTile(

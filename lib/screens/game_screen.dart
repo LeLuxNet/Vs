@@ -53,7 +53,8 @@ class _GameScreenState extends State<GameScreen> {
         onSelect: () async {
           Game game = await widget.game;
           Navigator.pushNamed(context, GameSettingsScreen.navigationName,
-              arguments: {"game": game, "new": false});
+              arguments: {"game": game, "new": false})
+              .then((_) => setState(() {}));
         });
     _settingsButton = Choice(
         title: 'settings',

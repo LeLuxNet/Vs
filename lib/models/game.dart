@@ -36,8 +36,8 @@ class Game extends ChangeNotifier {
   Game(this.id, this.name, this.counter, this.gameType, this.negativeAllowed);
 
   factory Game.fromMap(int id, Map map) {
-    Game game = Game(id, map["name"] ?? "", [], GameType.list[map["gameType"] ?? 0],
-        map["negativeAllowed"] ?? false);
+    Game game = Game(id, map["name"] ?? "", [],
+        GameType.list[map["gameType"] ?? 0], map["negativeAllowed"] ?? false);
     game.counter =
         map["counter"].map<Counter>((e) => Counter.fromMap(game, e)).toList();
     return game;

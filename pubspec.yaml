@@ -22,6 +22,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   path_provider: ^1.6.5
+  wakelock: ^0.1.4+1
 
   get_it: ^3.1.0
 
