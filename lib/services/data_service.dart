@@ -1,4 +1,5 @@
 import 'package:vs/models/game.dart';
+import 'package:vs/models/settings.dart';
 
 abstract class DataService {
 
@@ -14,4 +15,7 @@ abstract class DataService {
 
   setLastOpenGameId(int id);
 
+  saveSettings(Settings settings);
+
+  Future<Settings> getSettings();
 }

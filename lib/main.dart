@@ -6,12 +6,15 @@ import 'package:vs/screens/settings_screen.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/service_locator.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() {
   setupServiceLocator();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
           const Locale('en'),
           const Locale('de'),
         ],
+        navigatorObservers: [routeObserver],
         onGenerateRoute: (RouteSettings settings) {
           print('Build route for ${settings.name}');
           var routes = <String, WidgetBuilder>{

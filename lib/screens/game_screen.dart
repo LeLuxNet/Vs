@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vs/components/counter.dart';
 import 'package:vs/components/drawer.dart';
+import 'package:vs/listeners/page_route_listener.dart';
 import 'package:vs/models/counter.dart';
 import 'package:vs/models/game.dart';
 import 'package:vs/screens/game_settings_screen.dart';
@@ -8,6 +9,7 @@ import 'package:vs/screens/settings_screen.dart';
 import 'package:vs/services/data_service.dart';
 import 'package:vs/services/localization.dart';
 import 'package:vs/services/service_locator.dart';
+import 'package:wakelock/wakelock.dart';
 
 class GameScreen extends StatefulWidget {
   static final String navigationName = "/game";
@@ -20,7 +22,7 @@ class GameScreen extends StatefulWidget {
   _GameScreenState createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends State<GameScreen> with PageRouteListener {
   bool firstBuild = true;
   String _title = "";
 
@@ -32,6 +34,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   void initState() {
+    super.initState();
     if (widget.game == null) {
       widget.game = _dataService.getGame(null);
     }
@@ -61,8 +64,31 @@ class _GameScreenState extends State<GameScreen> {
         onSelect: () =>
             Navigator.pushNamed(context, SettingsScreen.navigationName));
     _popupMenuButtons = [_editButton, _settingsButton];
-    super.initState();
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    subscribe(context);
+  }
+
+  @override
+  void dispose() {
+    unsubscribe();
+    super.dispose();
+  }
+
+  @override
+  onOpen() {
+    _dataService.getSettings().then((value) {
+      if (value.wakeLock) {
+        Wakelock.enable();
+      }
+    });
+  }
+
+  @override
+  onClose() => Wakelock.disable();
 
   _getPopupMenu() {
     return PopupMenuButton<Choice>(

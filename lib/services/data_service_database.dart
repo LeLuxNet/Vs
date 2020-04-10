@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:vs/models/game.dart';
+import 'package:vs/models/settings.dart';
 import 'package:vs/services/data_service.dart';
 
 class DataServiceDatabase extends DataService {
@@ -13,7 +14,9 @@ class DataServiceDatabase extends DataService {
   static final DatabaseFactory dbFactory = databaseFactoryIo;
 
   static final String gameStoreName = "games";
+
   static final String lastOpenGameRecordName = "lastOpenGame";
+  static final String settingsRecordName = "settings";
 
   Database _db;
 
@@ -101,5 +104,20 @@ class DataServiceDatabase extends DataService {
     Database db = await _getInstance();
     await store.record(lastOpenGameRecordName).put(db, id);
     print("Last Game: $id");
+  }
+
+  @override
+  saveSettings(Settings settings) async {
+    var store = StoreRef.main();
+    Database db = await _getInstance();
+    await store.record(settingsRecordName).put(db, settings.toMap());
+  }
+
+  @override
+  Future<Settings> getSettings() async {
+    var store = StoreRef.main();
+    Database db = await _getInstance();
+    Map map = await store.record(settingsRecordName).get(db);
+    return map == null ? Settings.simple() : Settings.fromMap(map);
   }
 }
