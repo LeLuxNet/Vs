@@ -12,14 +12,26 @@ class AnimatedExpanded extends StatefulWidget {
   _AnimatedExpandedState createState() => _AnimatedExpandedState();
 }
 
-class _AnimatedExpandedState extends State<AnimatedExpanded> {
+class _AnimatedExpandedState extends State<AnimatedExpanded>
+    with TickerProviderStateMixin {
+  AnimationController _controller;
+  Animation _animation;
+
+  @override
+  void initState() {
+    _controller =
+        AnimationController(
+            duration: const Duration(milliseconds: 400), vsync: this);
+    _controller.forward();
+    _animation = IntTween(begin: 1, end: widget.steps).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder(
-        tween: IntTween(begin: 1, end: widget.steps),
-        curve: widget.curve,
-        duration: const Duration(milliseconds: 500),
-        builder: (_, int value, __) =>
-            Expanded(flex: value, child: widget.child));
+    return Expanded(flex: _animation.value, child: widget.child);
   }
 }

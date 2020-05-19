@@ -15,5 +15,6 @@
 
   "gameType_normal": "Normal",
   "gameType_catan": "Siedler von Catan",
-  "gameType_life": "Spiel des Lebens"
+  "gameType_life": "Spiel des Lebens",
+  "gameType_tableTennis": "Tischtennis"
 }

@@ -15,5 +15,6 @@
 
   "gameType_normal": "Normal",
   "gameType_catan": "Settlers of Catan",
-  "gameType_life": "The Game of Live"
+  "gameType_life": "The Game of Live",
+  "gameType_tableTennis": "Table tennis"
 }

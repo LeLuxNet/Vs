@@ -29,6 +29,7 @@ class Game extends ChangeNotifier {
   List<Counter> counter;
   bool negativeAllowed;
   GameType gameType;
+  int winner;
 
   static final Random _random = new Random();
   DataService _dataService = locator<DataService>();
@@ -53,13 +54,17 @@ class Game extends ChangeNotifier {
     return name;
   }
 
-  void setNegativeAllowed(bool value) {
+  setNegativeAllowed(bool value) {
     counter.forEach((e) {
       if (e.number < 0) {
         e.number = 0;
       }
     });
     negativeAllowed = value;
+  }
+
+  calcWinner() {
+    winner = gameType.winner(this);
   }
 
   restart() {
@@ -112,6 +117,7 @@ class Game extends ChangeNotifier {
   }
 
   save() {
+    calcWinner();
     _dataService.saveGame(this);
   }
 
